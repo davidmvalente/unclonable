@@ -28,3 +28,8 @@ yarn-error.log*
 .env
 .env.local
 .eslintcache
+
+**/__pycache__
+
+#Circom & ZKP
+**/instances
