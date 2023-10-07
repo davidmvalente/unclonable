@@ -33,3 +33,7 @@ yarn-error.log*
 
 #Circom & ZKP
 **/instances
+
+package.json
+package-lock.json
+node_modules/
