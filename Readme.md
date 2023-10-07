@@ -37,7 +37,3 @@ First ensure you are in a new and empty directory.
 #### Note:
 
 If you want to use it with truffle, make sure you use `include-truffle` branch.
-
-<div align="center">
-  <sub>Created by <a href="https://github.com/Shaivpidadi">Shaishav Pidadi</a>.</sub>
-</div>
