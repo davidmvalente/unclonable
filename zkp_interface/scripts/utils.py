@@ -51,24 +51,6 @@ def generate_input(image_path, output_path):
 
     return width, height, length
 
-
-import random, os
-
-def generate_input(output_path):
-    """
-    Generate a random input for a circuit of a given size
-    :param output_path: path to the output file
-    :param size: size of the input
-    """
-    shape = (3, 3, 3)
-
-    # Generate random integers
-    random_ints = [[[random.randint(0, 9) for _ in range(shape[2])] for _ in range(shape[1])] for _ in range(shape[0])]
-
-    json_input = {'in':random_ints}
-    os.makedirs('input',exist_ok=True)
-    with open(output_path, 'w') as outfile:
-        json.dump(json_input, outfile)
         
 
 def read_chunk(file):
@@ -155,6 +137,33 @@ def read_ppm_header(file_path):
         file_size = os.path.getsize(file_path)
 
         return width, height, file_size, header_size
+    
+    
+    
+import os
+def generate_circuit(info,circuit_template,id = None):
+    """
+    Given a circuit template, generates a circuit file with the given info
+    :param info: A dictionary containing the information to be replaced in the circuit template
+    :param circuit_template: The path to the circuit template
+    :param id: The id of the circuit if there are multiple circuits generated from the same template
+    :return: The path to the generated circuit file
+    """
+
+    out_circuit = circuit_template.split('/')[-1].split('.')[0]
+    os.makedirs('./zkp_interface/circuits/instances',exist_ok=True)
+
+    with open(circuit_template, 'r') as infile:
+        circuit = infile.read()
+        for k,v in info.items():
+            circuit = circuit.replace(k, str(v))
+        circuit = circuit.replace('//MAIN', '')
+
+    id = f'_{id}' if id is not None else ''
+    out_path = f'./zkp_interface/circuits/instances/{out_circuit}{id}.circom'
+    with open(out_path, 'w') as outfile:
+        outfile.write(circuit)
+    return out_path
 
 def get_ppm_parameters(file_path_png,file_path_json):   
     #convert png to ppm 
