@@ -4,9 +4,15 @@ Prototype to show ERC721 improvement that prevents the double minting of duplica
 
 ETHRome. October 2023.
 
+
+
 ## Installation
 
 First ensure you are in a new and empty directory.
+
+```
+export NODE_OPTIONS=--openssl-legacy-provider
+```
 
 1. Create .env file and add environment variables, you can refer .env.example file
 
