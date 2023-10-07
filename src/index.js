@@ -1,77 +1,42 @@
-/*****************************************/
-/* Detect the MetaMask Ethereum provider */
-/*****************************************/
+import React from "react";
+import ReactDOM from "react-dom";
+import { Provider } from "react-redux";
+import { createStore, applyMiddleware } from "redux";
+import createSagaMiddleware from "redux-saga";
 
-import detectEthereumProvider from '@metamask/detect-provider';
+import { Web3ReactProvider } from "@web3-react/core";
 
-const provider = await detectEthereumProvider();
+import App from "./App";
+import * as serviceWorker from "./serviceWorker";
+import getLibrary from "./utils/getLibrary";
+import rootReducer from "./store/reducer";
+import rootSaga from "./store/sagas";
 
-if (provider) {
-  startApp(provider);
-} else {
-  console.log('Please install MetaMask!');
-}
+import "bootstrap/dist/css/bootstrap.css";
+import "./assets/styles/index.css";
+import "./index.css";
 
-function startApp(provider) {
-  if (provider !== window.ethereum) {
-    console.error('Do you have multiple wallets installed?');
-  }
-}
+const sagaMiddleware = createSagaMiddleware();
 
-/**********************************************************/
-/* Handle chain (network) and chainChanged (per EIP-1193) */
-/**********************************************************/
+const store = createStore(
+  rootReducer,
+  applyMiddleware(sagaMiddleware)
+);
 
-const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+sagaMiddleware.run(rootSaga);
 
-window.ethereum.on('chainChanged', handleChainChanged);
+ReactDOM.render(
+  <React.StrictMode>
+    <Provider store={store}>
+      <Web3ReactProvider getLibrary={getLibrary}>
+        <App />
+      </Web3ReactProvider>
+    </Provider>
+  </React.StrictMode>,
+  document.getElementById("root")
+);
 
-function handleChainChanged(chainId) {
-  window.location.reload();
-}
-
-/***********************************************************/
-/* Handle user accounts and accountsChanged (per EIP-1193) */
-/***********************************************************/
-
-let currentAccount = null;
-window.ethereum.request({ method: 'eth_accounts' })
-  .then(handleAccountsChanged)
-  .catch((err) => {
-    console.error(err);
-  });
-
-window.ethereum.on('accountsChanged', handleAccountsChanged);
-
-function handleAccountsChanged(accounts) {
-  if (accounts.length === 0) {
-    console.log('Please connect to MetaMask.');
-  } else if (accounts[0] !== currentAccount) {
-    currentAccount = accounts[0];
-    showAccount.innerHTML = currentAccount;
-  }
-}
-
-/*********************************************/
-/* Access the user's accounts (per EIP-1102) */
-/*********************************************/
-
-const ethereumButton = document.querySelector('.enableEthereumButton');
-const showAccount = document.querySelector('.showAccount');
-
-ethereumButton.addEventListener('click', () => {
-  getAccount();
-});
-
-async function getAccount() {
-  const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
-    .catch((err) => {
-      if (err.code === 4001) {
-        console.log('Please connect to MetaMask.');
-      } else {
-        console.error(err);
-      }
-    });
-  const account = accounts[0];
-  showAccount.innerHTML = account;
-}
+// If you want your app to work offline and load faster, you can change
+// unregister() to register() below. Note this comes with some pitfalls.
+// Learn more about service workers: https://bit.ly/CRA-PWA
+serviceWorker.unregister();
