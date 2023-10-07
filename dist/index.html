@@ -6,10 +6,28 @@
     <title>NFT Minting</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.7/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="https://c0f4f41c-2f55-4863-921b-sdk-docs.github.io/cdn/metamask-sdk.js"></script>
 </head>
 <body class="bg-gray-100">
+
+<script>
+  const sdk = new MetaMaskSDK.MetaMaskSDK({
+    dappMetadata: {
+      name: "ethrome-erc721-demo-dapp",
+      url: window.location.host,
+    },
+    logging: {
+      sdk: false,
+    }
+  });
+</script>
+
     <div class="container mx-auto mt-10 p-4">
         <h1 class="text-2xl font-bold mb-4">Mint Your NFT</h1>
+
+        <button onclick="connect()" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-md mt-4 disabled:opacity-50">
+            Connect Wallet
+        </button>
 
         <div class="flex items-center space-x-2 mb-4">
             <label class="w-36 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md cursor-pointer">
@@ -34,6 +52,37 @@
         const preview = document.getElementById('preview');
         const imagePreview = document.getElementById('imagePreview');
         const mintButton = document.getElementById('mintButton');
+
+
+        /* */
+
+        function connect() {
+            ethereum
+            .request({
+                method: 'eth_requestAccounts',
+                params: [],
+            })
+            .then((res) => console.log('request accounts', res))
+            .catch((e) => console.log('request accounts ERR', e));
+        }
+
+        function addEthereumChain() {
+            ethereum
+            .request({
+                method: 'wallet_addEthereumChain',
+                params: [
+                {
+                    chainId: '0x89',
+                    chainName: 'Polygon',
+                    blockExplorerUrls: ['https://polygonscan.com'],
+                    nativeCurrency: { symbol: 'MATIC', decimals: 18 },
+                    rpcUrls: ['https://polygon-rpc.com/'],
+                },
+                ],
+            })
+            .then((res) => console.log('add', res))
+            .catch((e) => console.log('ADD ERR', e));
+        }
 
         uploadInput.addEventListener('change', () => {
             const file = uploadInput.files[0];
